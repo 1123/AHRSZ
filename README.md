@@ -1,7 +1,7 @@
 Project summary
 ---------------
 
-Java Implementation of the AHRSZ algorithm, for maintaining a topological order of a directed graph upon
+Java Implementation of the AHRSZ algorithm, for maintaining a [topological order](http://en.wikipedia.org/wiki/Topological_sorting) of a [directed graph](http://en.wikipedia.org/wiki/Directed_graph) upon
 insertion of edges as described in
 
 "A Dynamic Algorithm for Topologically Sorting Directed Acyclic Graphs" by David J. Pearce, Paul H. J. Kelly .
@@ -16,12 +16,19 @@ algorithm is not deterministic. A newly inserted edge may introduce multiple
 cycles at once. In this case it is up to the implementation to chose the order
 of removing the cycles. This may lead to different remaining graphs.
 
+Prerequisites
+-------------
+1. Git (for cloning this repository)
+2. mvn (for building)
+3. java 1.8 or higher (for running)
+
 Usage
 -----
 
-1. clone this repository
-2. install jar via maven : ``mvn install``
-3. add the jar as a dependency to your project:
+1. clone this repository 
+2. change directory into the new repository: ```cd AHRSZ```
+3. install jar via maven : ``mvn install``
+4. add the jar as a dependency to your project:
 ```maven
 <dependency>
   <groupId>AHRSZ</groupId>
@@ -29,7 +36,7 @@ Usage
   <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
-4. Use it as in the test cases of this project:
+5. Use it as in the test cases of this project:
 ```java
     @Test
     public void testComplexGraph() throws InvalidExpansionStateException, InvalidAhrszStateException {
