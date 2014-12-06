@@ -20,15 +20,6 @@ public class HashMapGraph<N extends Comparable<N>> {
         this.backward = new HashMap<>();
     }
 
-    public Set<N> nodes() {
-        // Using a set as result to eliminate duplicate nodes that are contained both in
-        // forward and backward as keys.
-        Set<N> result = new TreeSet<>();
-        result.addAll(this.forward.keySet());
-        result.addAll(this.backward.keySet());
-        return result;
-    }
-
     /**
      * This method returns all outgoing edges together with its weights for a given node.
      **/

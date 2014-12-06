@@ -92,20 +92,21 @@ public class AhrszAlgorithm<N extends Comparable<N>> {
      * @param to sink of the new edge
      */
 
-    private void reorder(final N from, final N to) throws InvalidExpansionStateException {
+    private void reorder(final N from, final N to) throws InvalidAhrszStateException {
         ExpansionState<N> es = new ExpansionState<>(from, to);
         while (! es.success) { // repeat until no more cycles found
             // the edge to be inserted may be removed when cycles are detected.
             // Once this newly inserted edge has been removed, there is no need to reorder.
             if (! this.hashMapGraph.hasEdge(from, to)) return;
-            es = new ExpansionState<>(from, to);
+            es = new ExpansionState<N>(from, to);
             this.expand(es);
         }
         // es.check(this.node2Index);
         switchPositions(es.shiftUp, es.shiftDown);
+        AhrszChecker.checkAhrsz(this);
     }
 
-    private void expand(ExpansionState<N> es) throws InvalidExpansionStateException {
+    private void expand(ExpansionState<N> es) {
         // while the frontiers are not empty.
         while (! es.finished()) {
             es.success = expandForward(es);
@@ -154,6 +155,10 @@ public class AhrszAlgorithm<N extends Comparable<N>> {
         return true;
     }
 
+    public void addEdge(N from, N to, double v) throws InvalidExpansionStateException, InvalidAhrszStateException {
+        this.addEdge(from, to, (float) v);
+    }
+
     private enum direction { forward, backward }
 
     private boolean detectAndRemoveCycle(
@@ -185,10 +190,10 @@ public class AhrszAlgorithm<N extends Comparable<N>> {
         List<N> shiftDownSorted = sortByIndex(shiftDown);
         List<N> oldOrder = new ArrayList<>(shiftUpSorted);
         oldOrder.addAll(new ArrayList<>(shiftDownSorted));
-        Collections.sort(oldOrder, new IndexComparator<>(this.node2Index));
+        Collections.sort(oldOrder, new IndexComparator<N>(this.node2Index));
         List<N> newOrder = new ArrayList<>(shiftDownSorted);
         newOrder.addAll(shiftUpSorted);
-        HashMap<N, Integer> newNode2Index = new HashMap<>();
+        HashMap<N, Integer> newNode2Index = new HashMap<N, Integer>();
         int position = 0;
         for (N n: oldOrder) {
             int index = this.node2Index.get(n);
