@@ -1,0 +1,7 @@
+plot(
+    c($xValues),
+    c($yValues),
+    xlab="nodes",
+    ylab="runtime in milliseconds",
+    main="Runtime for insertion of $insertions edges into a graph with minimum cycle weight $minWeight",
+    ylim=c(0,1.33))

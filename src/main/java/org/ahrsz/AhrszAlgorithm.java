@@ -24,7 +24,7 @@ import java.util.*;
 
 public class AhrszAlgorithm<N extends Comparable<N>> {
 
-    public HashMapGraph<N> hashMapGraph;
+    public DirectedGraph<N> directedGraph;
     /**
      * node2Index contains the topological order.
      */
@@ -32,11 +32,11 @@ public class AhrszAlgorithm<N extends Comparable<N>> {
     private int maxIndex;
     private int minIndex;
 
-    public AhrszAlgorithm() {
+    public AhrszAlgorithm(DirectedGraph<N> directedGraph) {
+        this.directedGraph = directedGraph;
         node2Index = new HashMap<>();
         maxIndex = 1;  // the index of the next top insertion
         minIndex = 0;  // the index of the next bottom insertion
-        hashMapGraph = new HashMapGraph<>();
     }
 
     private void put(N node, int index) {
@@ -54,7 +54,7 @@ public class AhrszAlgorithm<N extends Comparable<N>> {
 
     public void addEdge(N from, N to, float weight) throws InvalidExpansionStateException, InvalidAhrszStateException {
         if (from.equals(to)) return;
-        hashMapGraph.addEdge(from, to, weight);
+        directedGraph.addEdge(from, to, weight);
         // both nodes are new.
         if (! node2Index.containsKey(from) && ! node2Index.containsKey(to)) {
             insertTop(from, to);
@@ -97,13 +97,12 @@ public class AhrszAlgorithm<N extends Comparable<N>> {
         while (! es.success) { // repeat until no more cycles found
             // the edge to be inserted may be removed when cycles are detected.
             // Once this newly inserted edge has been removed, there is no need to reorder.
-            if (! this.hashMapGraph.hasEdge(from, to)) return;
+            if (! this.directedGraph.hasEdge(from, to)) return;
             es = new ExpansionState<N>(from, to);
             this.expand(es);
         }
         // es.check(this.node2Index);
         switchPositions(es.shiftUp, es.shiftDown);
-        AhrszChecker.checkAhrsz(this);
     }
 
     private void expand(ExpansionState<N> es) {
@@ -122,8 +121,8 @@ public class AhrszAlgorithm<N extends Comparable<N>> {
         if (es.backwardQueue.isEmpty()) { return true; }
         Path<N> highestPath = es.backwardQueue.remove();
         N highest = highestPath.get(highestPath.size() - 1);
-        if (this.hashMapGraph.getB(highest) == null) return true;
-        for (N predecessor : this.hashMapGraph.getB(highest).keySet()) {
+        if (this.directedGraph.getB(highest) == null) return true;
+        for (N predecessor : this.directedGraph.getB(highest).keySet()) {
             if (node2Index.get(predecessor) <= node2Index.get(es.to)) continue;
             if (detectAndRemoveCycle(es.forwardQueue, predecessor, highestPath, direction.backward)) return false;
             Path<N> predecessorPath = new Path<N>(highestPath);
@@ -141,8 +140,8 @@ public class AhrszAlgorithm<N extends Comparable<N>> {
         Path<N> lowestPath = es.forwardQueue.remove();
         N lowest = lowestPath.get(lowestPath.size() - 1);
         // check if there are any outgoing edges from the end of the lowest path.
-        if (this.hashMapGraph.getF(lowest) == null) return true;
-        for (N successor : this.hashMapGraph.getF(lowest).keySet()) {
+        if (this.directedGraph.getF(lowest) == null) return true;
+        for (N successor : this.directedGraph.getF(lowest).keySet()) {
             if (detectAndRemoveCycle(es.backwardQueue, successor, lowestPath, direction.forward)) return false;
             // only add nodes to the frontier that have higher priority then the source of the
             // new edge.
@@ -159,6 +158,22 @@ public class AhrszAlgorithm<N extends Comparable<N>> {
         this.addEdge(from, to, (float) v);
     }
 
+    public Set<N> forwardKeys() {
+        return this.directedGraph.getForwardKeys();
+    }
+
+    public Set<N> backwardKeys() {
+        return this.directedGraph.getBackwardKeys();
+    }
+
+    public Set<N> getB(N source) {
+        return this.directedGraph.getB(source).keySet();
+    }
+
+    public Set<N> getF(N source) {
+        return this.directedGraph.getF(source).keySet();
+    }
+
     private enum direction { forward, backward }
 
     private boolean detectAndRemoveCycle(
@@ -168,9 +183,9 @@ public class AhrszAlgorithm<N extends Comparable<N>> {
         int index = backwardList.indexOf(new Path<>(successor));
         path.addAll(Lists.reverse(backwardList.get(index)));
         if (dir == direction.forward) {
-            this.hashMapGraph.removeCycle(path);
+            this.directedGraph.removeCycle(path);
         } else {
-            this.hashMapGraph.removeCycle(Lists.reverse(path));
+            this.directedGraph.removeCycle(Lists.reverse(path));
         }
         return true;
     }

@@ -29,6 +29,18 @@ public class Path<N extends Comparable> extends ArrayList<N> implements Comparab
         return this.compareTo(o) == 0;
     }
 
+    /**
+     * This method is used within the cycle detection code to find out if the successor/predecessor
+     * during expansion is the same as the last element within a path of the opposite frontier
+     * (backward queue/forward queue). Therefore only the last elements are compared.
+     *
+     * Yet within the priority queue, this is not the right way to compare paths.
+     * Therefore we should use some other method to detect cycles.
+
+     * @param other the path to compare to.
+     * @return true if the last elements of the path are the same.
+     */
+
     @Override
     public int compareTo(Path<N> other) {
         N thisLast = this.get(this.size() - 1);

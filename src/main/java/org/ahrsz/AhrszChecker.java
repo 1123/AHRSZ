@@ -10,8 +10,8 @@ public class AhrszChecker {
 
     private static <N extends Comparable<N>> void checkForward(final AhrszAlgorithm<N> ahrsz)
             throws InvalidAhrszStateException {
-        for (final N source : ahrsz.hashMapGraph.forward.keySet()) {
-            for (final N sink : ahrsz.hashMapGraph.forward.get(source).keySet()) {
+        for (final N source : ahrsz.forwardKeys()) {
+            for (final N sink : ahrsz.getF(source)) {
                 if (ahrsz.node2Index.get(source) >= ahrsz.node2Index.get(sink))
                     throw new InvalidAhrszStateException();
             }
@@ -21,8 +21,8 @@ public class AhrszChecker {
 
     private static <N extends Comparable<N>> void checkBackward(final AhrszAlgorithm<N> ahrsz)
             throws InvalidAhrszStateException {
-        for (final N source : ahrsz.hashMapGraph.backward.keySet()) {
-            for (final N sink : ahrsz.hashMapGraph.backward.get(source).keySet()) {
+        for (final N source : ahrsz.backwardKeys()) {
+            for (final N sink : ahrsz.getB(source)) {
                 if (ahrsz.node2Index.get(source) <= ahrsz.node2Index.get(sink))
                     throw new InvalidAhrszStateException();
             }
